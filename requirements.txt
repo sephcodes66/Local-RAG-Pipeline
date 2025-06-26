@@ -1,0 +1,6 @@
+# requirements.txt
+ollama
+chromadb
+pypdf
+sentence-transformers
+tqdm
