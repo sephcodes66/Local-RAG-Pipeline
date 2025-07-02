@@ -1,0 +1,140 @@
+Metadata-Version: 2.4
+Name: rag_project
+Version: 0.1.0
+Summary: A local RAG pipeline for Q&A with your documents.
+Author-email: Gemini <gemini@google.com>
+Project-URL: Homepage, https://github.com/google/gemini
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# Local RAG Pipeline with Phi-3 and ChromaDB
+## 📖 Overview
+This project implements a complete, local-first Retrieval-Augmented Generation (RAG) pipeline. It's designed to answer questions based on a collection of PDF documents you provide. The entire process—from data ingestion and embedding to querying and generation—runs on your local machine, ensuring data privacy and requiring no cloud services or paid API keys.
+
+The core of this project is to demonstrate a modern data engineering workflow applied to the domain of Large Language Models (LLMs). It showcases the processing of unstructured data (PDFs), structuring it for efficient retrieval using a vector database (ChromaDB), and interfacing with a local LLM (Microsoft's Phi-3) to generate context-aware answers.
+
+This project directly demonstrates skills relevant to Data Engineering, including:
+
+- ETL/ELT Processes: A clear ETL (Extract, Transform, Load) process is implemented:
+    - Extract: Text is extracted from PDF documents.
+    - Transform: The text is chunked and converted into vector embeddings.
+    - Load: The chunks and their embeddings are loaded into a persistent ChromaDB vector database.
+
+- Python, SQL-like Queries & Automation: The pipeline is built in Python, uses a vector database, and is automated with a Makefile.
+
+- Unstructured Data & RAG: It directly tackles the challenge of processing unstructured text and building a RAG pipeline, a highly relevant skill in the modern data and AI landscape.
+
+## 📜 Table of Contents
+1. ✨ Features 
+
+2. 🛠️ Technologies Used
+
+3. 📂 Project Structure
+
+4. 🚀 Setup and Installation
+
+5. ▶️ How to Run the Project
+
+6. 💡 Troubleshooting Common Issues
+
+## 1. ✨ Features
+
+- 100% Local: All components run locally. No API keys or internet connection required after the initial setup.
+
+- PDF Document Source: Easily add your own PDF documents to the docs folder to build a custom knowledge base.
+
+- Persistent Vector Storage: Uses ChromaDB to save the document index locally, so you only need to process your documents once.
+
+- High-Quality Local LLM: Leverages the powerful and efficient phi3:mini model run via Ollama.
+
+- Interactive Q&A: Provides a simple command-line interface to ask questions about your documents.
+
+## 2. 🛠️ Technologies Used
+
+| Category | Technology | Purpose | 
+| ----------- | ----------- | ----------- |
+| Language | Python 3 | Core programming language for the pipeline |
+| LLM Engine | Ollama | For serving the local Large Language Model |
+| Language Model | phi3:mini | The efficient LLM used for answer generation |
+| Vector Database | ChromaDB | Storing and querying text chunks and embeddings |
+| Embedding Model | all-MiniLM-L6-v2 | Generating semantic vector embeddings from text |
+| Core Libraries | ollama, chromadb, pypdf | Interacting with the tech stack components |
+| Automation | Makefile | Streamlining setup, indexing, and querying |
+
+## 3. 📂 Project Structure
+
+```
+local_rag_project/
+│
+├── docs/
+│   └── example.pdf         # Place source PDF documents here
+│
+├── src/
+│   └── rag_pipeline.py     # The main script
+│
+├── chroma_db/              # Directory for the persistent vector database
+│
+├── .gitignore
+├── Makefile                # Automation for setup and execution
+├── README.md               # Documentation
+└── requirements.txt        # Project dependencies
+```
+
+## 4. 🚀 Setup (local) and Installation
+
+### Prerequisite: Install Ollama
+This project requires Ollama to run the local LLM.
+
+- Download and install Ollama from the official website.
+
+- After installation, launch the Ollama application. You should see a llama icon in your system's menu bar.
+
+- Pull the ```phi3:mini``` model by running the following command in your terminal:
+```
+ollama pull phi3:mini
+```
+> **Note: The Ollama application must be running in the background for the project to work.**
+
+### Project Setup
+These commands will set up a virtual environment and install the necessary Python packages.
+
+- Clone the repository (if you haven't already):
+```
+git clone https://github.com/sephcodes66/Smart_Dita_Factory 
+cd local_rag_project
+```
+- Run the setup command from the Makefile:
+```
+make setup
+```
+This will create a ```venv``` directory and install all packages listed in ```requirements.txt```.
+
+## 5. ▶️ How to Run the Project
+The ```Makefile``` simplifies the entire workflow into two main steps.
+
+- Step 1: Index Your Documents
+This command processes all PDFs in the ./docs folder and saves them into the local vector database. You only need to run this once, or whenever you add, remove, or change your source documents.
+```
+make index
+```
+- Step 2: Ask Questions
+This command starts the interactive query session, allowing you to ask questions about your indexed documents.
+```
+make query
+```
+The script will then prompt you to enter your question. To exit the session, simply type exit and press Enter.
+
+## 6. 💡 Troubleshooting Common Issues
+- Error: Connection refused
+    - Cause: The Ollama application is not running in the background.
+    - Solution: Launch the Ollama application from your system's Application folder. Verify it's running by checking for the llama icon in your menu bar or by running ollama list in a new terminal.
+
+- Old or incorrect sources appear in the results.
+    - Cause: The ChromaDB database (./chroma_db) is persistent and contains data from previously indexed files that you may have since deleted.
+    - Solution: To create a fresh index, first delete the old database directory and then re-run the indexing command.
+
+> **Important: This will permanently delete your existing index.**
+[(Back to top)](##table-of-contents)

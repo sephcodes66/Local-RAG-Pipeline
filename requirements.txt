@@ -4,3 +4,6 @@ chromadb
 pypdf
 sentence-transformers
 tqdm
+ruff
+pytest
+pytest-mock
