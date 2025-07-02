@@ -110,3 +110,20 @@ The `Makefile` provides a set of commands to streamline the development workflow
     make index
     ```
     > **Warning:** This will permanently delete your existing index.
+
+## Licenses
+
+This project is licensed under the MIT License.
+
+The following is a list of the main dependencies and their licenses:
+
+| Dependency              | License            |
+| ----------------------- | ------------------ |
+| ollama                  | MIT                |
+| chromadb                | Apache 2.0         |
+| pypdf                   | BSD-3-Clause       |
+| sentence-transformers   | Apache 2.0         |
+| tqdm                    | MIT/MPL-2.0        |
+| ruff                    | MIT                |
+| pytest                  | MIT                |
+| pytest-mock             | MIT                |
