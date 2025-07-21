@@ -15,27 +15,28 @@ from rag_project.vector_db import (
 
 def index_documents():
     """
-    The main indexing pipeline. It loads PDFs, chunks the text, generates embeddings,
-    and stores them in a persistent ChromaDB vector database.
+    The main indexing pipeline.
+    It loads PDFs, chunks the text, generates embeddings, and stores them
+    in a persistent ChromaDB vector database. This is the "setup" step.
     """
     print('--- Starting Indexing Pipeline ---')
 
-    # 1. Load and Extract Text from PDFs
+    # Step 1: Load and parse PDFs from the source directory.
     documents = get_pdf_text(PDF_SOURCE_DIR)
     if not documents:
-        print('No PDF documents found. Aborting.')
+        print('No PDF documents found. Nothing to index. Aborting.')
         return
 
-    # 2. Split Text into Chunks
+    # Step 2: Split the extracted text into manageable chunks.
     chunks = get_text_chunks(documents)
     print(f'Created {len(chunks)} text chunks.')
 
-    # 3. Initialize ChromaDB and Embedding Model
+    # Step 3: Initialize our tools - the vector DB and the embedding model.
     print('Initializing ChromaDB and loading embedding model...')
     collection = get_chroma_collection()
     embedding_model = get_embedding_model()
 
-    # 4. Generate Embeddings and Store in ChromaDB
+    # Step 4: Generate embeddings for each chunk and store them.
     embed_and_store_chunks(collection, chunks, embedding_model)
 
     print('--- Indexing Pipeline Complete ---')
@@ -43,50 +44,57 @@ def index_documents():
 
 def run_query():
     """
-    The main query pipeline. It takes a user's question, finds relevant document
-    chunks from the vector database, and uses an LLM to generate an answer.
+    The main query pipeline.
+    It takes a user's question, finds relevant document chunks from the
+    vector database, and uses an LLM to generate a final answer.
     """
     print('--- Starting Query Session ---')
     print('Initializing ChromaDB and loading models...')
 
-    # 1. Initialize ChromaDB and Models
+    # Initialize the tools we need for querying.
     collection = get_chroma_collection()
     embedding_model = get_embedding_model()
 
+    # This loop runs the interactive Q&A session.
     while True:
-        # 2. Get User Query
         query_text = input("\nEnter your query (or type 'exit' to quit): ").strip()
         if query_text.lower() == 'exit':
             break
         if not query_text:
             continue
 
-        # 3. Find Relevant Context from Vector DB
+        # Step 1: Find the most relevant document chunks for the query.
         print('Finding relevant context...')
         query_embedding = embedding_model.encode(
             query_text, convert_to_tensor=False
         ).tolist()
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=5,  # Retrieve top 5 most relevant chunks
+            n_results=5,  # Retrieve the top 5 most relevant chunks
             include=['documents', 'metadatas'],
         )
 
-        context_str = '\n---\n'.join(
-            f'Source: {meta["source"]}\nContent: {doc}'
+        # Step 2: Stitch the retrieved chunks together into a single context string.
+        context_str = "\n---\n".join(
+            f"Source: {meta['source']}\nContent: {doc}"
             for doc, meta in zip(results['documents'][0], results['metadatas'][0])
         )
 
-        # 4. Generate Answer with LLM
+        # Step 3: Build the prompt for the LLM.
+        # This is a critical step. The prompt guides the LLM to answer based
+        # *only* on the context we provide. This is the core of RAG.
         prompt = f"""
         You are an expert Q&A assistant. Your task is to answer the user's
-        question based *only* on the provided context. If the context does not
-        contain the information needed to answer the question, you must state:
-        "The provided context does not contain enough information to answer this
-        question."
+        question based *only* on the provided context.
+
+        If the context does not contain the information needed to answer the
+        question, you must state: "The provided context does not contain
+        enough information to answer this question."
 
         CONTEXT:
+        ---
         {context_str}
+        ---
 
         QUESTION:
         {query_text}
@@ -94,12 +102,13 @@ def run_query():
         ANSWER:
         """
 
+        # Step 4: Send the prompt to the LLM and stream the response.
         print('Generating answer...')
         response_stream = ollama.chat(
             model=LLM_MODEL, messages=[{'role': 'user', 'content': prompt}], stream=True
         )
 
-        # 5. Stream the response to the console
+        # Streaming the response gives a better user experience.
         full_response = ''
         for chunk in response_stream:
             content = chunk['message']['content']
@@ -109,6 +118,7 @@ def run_query():
 
 
 def main():
+    # A simple command-line interface to choose between indexing and querying.
     parser = argparse.ArgumentParser(
         description='A local RAG pipeline for Q&A with your documents.'
     )
@@ -127,6 +137,7 @@ def main():
     elif args.query:
         run_query()
     else:
+        # Default behavior if no arguments are given.
         print('Please specify a mode to run: --index or --query')
         parser.print_help()
 

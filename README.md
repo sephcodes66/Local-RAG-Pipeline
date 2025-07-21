@@ -1,129 +1,67 @@
-# Local RAG Pipeline with Phi-3 and ChromaDB
 
-This project provides a complete, local-first Retrieval-Augmented Generation (RAG) pipeline for question-answering over a collection of PDF documents. The entire workflow runs on your local machine, ensuring data privacy and eliminating the need for cloud services or API keys.
+> **Note:** This project was a fun experiment built by a human developer with the help of an AI assistant. The goal was to explore local-first RAG pipelines.
 
-The pipeline demonstrates a modern data engineering approach to LLM application development, including data extraction, chunking, embedding, and vector storage.
+# My Local RAG Project
 
-## Core Technologies
+This is a little project I put together to play around with Retrieval-Augmented Generation (RAG). It's a simple pipeline that lets you ask questions about a collection of PDF documents, and it all runs on your local machine. No data ever leaves your computer.
 
-| Category          | Technology         | Purpose                               |
-| ----------------- | ------------------ | ------------------------------------- |
-| Language          | Python 3           | Core programming language             |
-| LLM Engine        | Ollama             | Serving the local LLM                 |
-| Language Model    | `phi3:mini`        | Answer generation                     |
-| Vector Database   | ChromaDB           | Storing and querying document chunks  |
-| Embedding Model   | `all-MiniLM-L6-v2` | Generating vector embeddings          |
-| Core Libraries    | `ollama`, `chromadb`, `pypdf` | Interacting with the tech stack       |
-| Automation        | Makefile           | Streamlining development tasks        |
-| Code Quality      | `ruff`, `pytest`   | Linting, formatting, and testing      |
+I wanted to build something that was easy to set up and use, so I tried to keep the dependencies to a minimum. See the `DESIGN_CHOICES.md` for more on why I picked the tools I did.
 
-## Project Structure
+## What's in the Box?
 
-```
-.
-├── Makefile
-├── README.md
-├── docs
-│   ├── 1706.03762v7.pdf
-│   ├── 2019-duckdbdemo.pdf
-│   └── 2307.06435v10.pdf
-├── pyproject.toml
-├── requirements.txt
-├── ruff.toml
-├── src
-│   ├── __init__.py
-│   └── rag_project
-│       ├── __init__.py
-│       ├── config.py
-│       ├── data_processing.py
-│       ├── main.py
-│       └── vector_db.py
-└── tests
-    ├── __init__.py
-    └── test_data_processing.py
-```
+-   **Language:** Python 3
+-   **LLM Engine:** Ollama (because it's awesome for running models locally)
+-   **Language Model:** `phi3:mini` (a great little model)
+-   **Vector Database:** ChromaDB (super easy to get started with)
+-   **Embedding Model:** `all-MiniLM-L6-v2` (fast and effective)
+-   **Core Libraries:** `ollama`, `chromadb`, `pypdf`
+-   **Automation:** A simple `Makefile` to make life easier
+-   **Code Quality:** `ruff` for linting and `pytest` for testing (though I need to add more tests!)
 
-## Getting Started
+## How to Get it Running
 
-### Prerequisites
+### Stuff you need first
 
-- **Ollama:** This project requires Ollama to run the local LLM.
-  1. Download and install [Ollama](https://ollama.com/).
-  2. Launch the Ollama application.
-  3. Pull the `phi3:mini` model:
-     ```bash
-     ollama pull phi3:mini
-     ```
-  > **Note:** The Ollama application must be running in the background for the project to work.
+-   **Ollama:** You'll need to have [Ollama](https://ollama.com/) installed.
+    1.  Once it's installed, pull the model: `ollama pull phi3:mini`.
+    2.  Make sure the Ollama application is running before you start.
 
 ### Installation
 
-1.  **Clone the repository:**
+1.  **Clone the repo:**
     ```bash
     git clone https://github.com/sephcodes66/Smart_Dita_Factory
     cd RAG_Project_Local
     ```
 
-2.  **Create a virtual environment and install dependencies:**
+2.  **Set up your environment and install the goods:**
     ```bash
     make setup
     ```
 
-## Usage
+## How to Use It
 
-The `Makefile` provides a set of commands to streamline the development workflow.
-
--   **Index Documents:**
-    Process all PDFs in the `./docs` folder and store them in the local vector database. Run this command once, or whenever you add, remove, or change the source documents.
+1.  **Drop your PDFs** into the `docs` folder.
+2.  **Index your documents:** This will process the PDFs and load them into the vector database.
     ```bash
     make index
     ```
-
--   **Ask Questions:**
-    Start the interactive query session to ask questions about your indexed documents.
+3.  **Ask away!** This starts the interactive Q&A session.
     ```bash
     make query
     ```
-    To exit the session, type `exit` and press Enter.
+    You can type `exit` to end the session.
 
--   **Run Linter:**
-    Check the code quality and formatting using `ruff`.
-    ```bash
-    make lint
-    ```
+### Other useful commands
 
--   **Run Tests:**
-    Run the unit tests using `pytest`.
-    ```bash
-    make test
-    ```
+-   **Linting:** `make lint`
+-   **Testing:** `make test`
 
-## Troubleshooting
+## A Few Notes...
 
--   **Error: Connection refused:**
-    This error indicates that the Ollama application is not running. Launch the Ollama application and ensure it is running in the background.
-
--   **Stale or incorrect sources in results:**
-    The ChromaDB database is persistent. If you have deleted or modified your source documents, you may need to delete the `chroma_db` directory and re-index your documents.
+-   If you get a "connection refused" error, it probably means the Ollama application isn't running.
+-   If you change the documents in the `docs` folder, you'll need to re-index them. The easiest way is to just delete the `chroma_db` directory and run `make index` again.
     ```bash
     rm -rf chroma_db
     make index
     ```
-    > **Warning:** This will permanently delete your existing index.
-
-## Licenses
-
-This project is licensed under the MIT License.
-
-The following is a list of the main dependencies and their licenses:
-
-| Dependency              | License            |
-| ----------------------- | ------------------ |
-| ollama                  | MIT                |
-| chromadb                | Apache 2.0         |
-| pypdf                   | BSD-3-Clause       |
-| sentence-transformers   | Apache 2.0         |
-| tqdm                    | MIT/MPL-2.0        |
-| ruff                    | MIT                |
-| pytest                  | MIT                |
-| pytest-mock             | MIT                |

@@ -1,3 +1,9 @@
-venv/
+
+# Folders to ignore
+.pytest_cache/
+.ruff_cache/
 chroma_db/
+src/rag_project.egg-info/
+venv/
 .DS_Store
+plan.md
